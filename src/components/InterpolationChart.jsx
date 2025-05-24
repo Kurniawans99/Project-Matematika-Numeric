@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 
 export function InterpolationChart({
   data,
@@ -17,7 +17,7 @@ export function InterpolationChart({
   const validPoints = points.filter(pt => typeof pt.x === 'number' && typeof pt.y === 'number' && !isNaN(pt.x) && !isNaN(pt.y));
 
   const getCursorValue = () => {
-    if (!isInteractionActive) return 'pointer'; 
+    if (!isInteractionActive) return 'pointer';
     if (isPanning) return 'grabbing';
     return 'grab';
   };
@@ -30,6 +30,56 @@ export function InterpolationChart({
     cursor: getCursorValue(),
   };
 
+  // Fungsi untuk mendapatkan tick kustom untuk sumbu X
+  const getCustomXTicks = () => {
+    const xValues = new Set(); // Menggunakan Set untuk menghindari duplikasi secara otomatis
+
+    // Tambahkan nilai x dari points
+    points.forEach(p => {
+      const numX = parseFloat(p.x);
+      if (!isNaN(numX)) {
+        xValues.add(numX);
+      }
+    });
+
+    // Tambahkan nilai x dari resultPoint
+    if (resultPoint) {
+      const numResX = parseFloat(resultPoint.x);
+      if (!isNaN(numResX)) {
+        xValues.add(numResX);
+      }
+    }
+
+    // Jika tidak ada nilai x spesifik, kembalikan undefined agar Recharts menggunakan logika default
+    if (xValues.size === 0) {
+      return undefined;
+    }
+
+    // Ubah Set menjadi array dan urutkan
+    return Array.from(xValues).sort((a, b) => a - b);
+  };
+
+  const customXTicks = getCustomXTicks();
+
+  // Persiapkan props untuk XAxis
+  const xAxisProps = {
+    dataKey: "x",
+    type: "number",
+    domain: viewDomainX, // Pastikan viewDomainX mencakup semua customXTicks
+    allowDataOverflow: true,
+    tickFormatter: v => (typeof v === 'number' ? v.toFixed(1) : ''),
+    stroke: "#9CA3AF",
+    scale: "linear",
+    axisLine: { stroke: '#D1D5DB', strokeWidth: 2 },
+    tick: { fill: '#9CA3AF' },
+  };
+
+  // Tambahkan prop ticks jika customXTicks ada
+  if (customXTicks && customXTicks.length > 0) {
+    xAxisProps.ticks = customXTicks;
+  }
+  // Jika customXTicks kosong atau undefined, XAxis akan menggunakan tick generation default.
+
   return (
     <div className="bg-gray-800 p-2 sm:p-4 rounded-lg border border-gray-700 h-full flex flex-col">
       <div
@@ -40,25 +90,31 @@ export function InterpolationChart({
         onMouseLeave={isInteractionActive ? onMouseUpOrLeave : undefined}
         onWheel={isInteractionActive ? onWheel : undefined}
         className="flex-grow bg-gray-900 rounded-lg p-1 sm:p-2 select-none overflow-hidden"
-        style={wrapperDivStyle} 
+        style={wrapperDivStyle}
       >
         {data && data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={data}
-              margin={{ top: 15, right: 25, left: 15, bottom: 15 }}
-              style={lineChartStyle} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+              style={lineChartStyle}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis
-                dataKey="x" type="number" domain={viewDomainX} allowDataOverflow={true}
-                tickFormatter={v => typeof v === 'number' ? v.toFixed(1) : ''} stroke="#9CA3AF" scale="linear"
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="#4B5563" />
+              <XAxis {...xAxisProps}>
+                <Label value="Sumbu X" offset={-20} position="insideBottom" fill="#9CA3AF" />
+              </XAxis>
               <YAxis
-                domain={viewDomainY} allowDataOverflow={true}
-                tickFormatter={v => typeof v === 'number' ? v.toFixed(1) : ''} stroke="#9CA3AF" scale="linear"
-              />
-              <Legend wrapperStyle={{ paddingTop: '10px' }}/>
+                domain={viewDomainY}
+                allowDataOverflow={true}
+                tickFormatter={v => typeof v === 'number' ? v.toFixed(1) : ''}
+                stroke="#9CA3AF"
+                scale="linear"
+                axisLine={{ stroke: '#D1D5DB', strokeWidth: 2 }}
+                tick={{ fill: '#9CA3AF' }}
+              >
+                <Label value="Sumbu Y" angle={-90} offset={0} position="insideLeft" fill="#9CA3AF" style={{ textAnchor: 'middle' }} />
+              </YAxis>
+              <Legend wrapperStyle={{ paddingTop: '10px' }} />
               <Line type="monotone" dataKey="y" stroke="#EAB308" strokeWidth={2} dot={false} isAnimationActive={false} name="Kurva Interpolasi" />
               {validPoints.map((pt, i) => (
                 <Line key={`input-pt-${i}`} data={[{ x: Number(pt.x), y: Number(pt.y) }]} type="basis" dataKey="y"

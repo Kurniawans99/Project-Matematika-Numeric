@@ -11,7 +11,8 @@ export default function App() {
   const [points, setPoints] = useState([
     { x: 0, y: 0 },
     { x: 1, y: 1 },
-    { x: 2, y: 4 }
+    { x: 2, y: 4 },
+    { x : 3, y: -4}
   ]);
   const [targetX, setTargetX] = useState(1.5);
   const [result, setResult] = useState(null);
