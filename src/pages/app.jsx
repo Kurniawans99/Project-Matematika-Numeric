@@ -1,15 +1,17 @@
+// Impor yang mungkin sudah ada di LagrangeInterpolation.jsx
 import { useState, useEffect } from 'react';
-import { lagrangeUtils } from '../utils/lagrange';
+import { evaluateLagrangePolynomial, generateLagrangeFormulaTex } from '../utils/lagrange';
 import { PointsInput } from '../components/PointsInput';
 import { InterpolationForm } from '../components/InterpolationForm';
-import { FormulaDisplay } from '../components/FormulaDisplay';
+import { FormulaDisplay } from '../components/FormulaDisplay'; // Pastikan path ini benar
 import { InterpolationChart } from '../components/InterpolationChart';
 import { About } from '../components/About';
+import 'katex/dist/katex.min.css';
 
 export default function LagrangeInterpolation() {
   const [points, setPoints] = useState([
-    { x: 0, y: 0 }, 
-    { x: 1, y: 1 }, 
+    { x: 0, y: 0 },
+    { x: 1, y: 1 },
     { x: 2, y: 4 }
   ]);
   const [targetX, setTargetX] = useState(1.5);
@@ -23,52 +25,67 @@ export default function LagrangeInterpolation() {
   };
 
   const addPoint = () => setPoints([...points, { x: 0, y: 0 }]);
-  
+
   const removePoint = idx => {
     if (points.length > 2) {
       setPoints(points.filter((_, i) => i !== idx));
     }
   };
 
-  const generateChartData = () => {
+  const generateChartDataForComponent = () => {
     if (points.length < 2) return [];
     const xs = points.map(p => p.x);
     const minX = Math.min(...xs) - 2;
     const maxX = Math.max(...xs) + 2;
-    const data = Array.from({ length: 201 }, (_, i) => {
-      const x = minX + (i / 200) * (maxX - minX);
-      const y = lagrangeUtils(x, points);
+    const numSteps = 200;
+    const stepSize = (maxX - minX) / numSteps;
+    const data = Array.from({ length: numSteps + 1 }, (_, i) => {
+      const x = minX + i * stepSize;
+      const y = evaluateLagrangePolynomial(x, points);
       return { x, y };
     });
     return data;
   };
 
   const calculate = () => {
-    const val = lagrangeUtils(targetX, points);
-    setResult(val);
-    
-    // Build formula string
-    const terms = points.map((pt, i) => {
-      const factors = points
-        .filter((_, j) => i !== j)
-        .map(pj => `(x - ${pj.x})/(${pt.x} - ${pj.x})`)
-        .join(' × ');
-      return `${pt.y} × [${factors}]`;
-    });
-    setFormula(`P(x) = ${terms.join(' + ')}`);
-    setChartData(generateChartData());
+    if (points.length === 0) {
+      setResult(null);
+      setFormula('');
+      setChartData([]);
+      return;
+    }
+
+    const calculatedValue = evaluateLagrangePolynomial(targetX, points);
+    setResult(calculatedValue);
+
+    const formulaTex = generateLagrangeFormulaTex(points);
+    setFormula(formulaTex);
+
+    setChartData(generateChartDataForComponent());
   };
 
   useEffect(() => {
-    setChartData(generateChartData());
-  }, [points]);
+  
+    if (points.length > 0) {
+      calculate();
+    } else {
+      // Reset jika tidak ada poin
+      setResult(null);
+      setFormula('');
+      setChartData([]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [points, targetX]); 
 
   useEffect(() => {
-    calculate();
-  }, []);
+    if (points.length > 0) {
+      calculate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Dijalankan sekali saat mount
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen bg-gray-900 p-6 text-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -76,7 +93,7 @@ export default function LagrangeInterpolation() {
             INTERPOLASI POLINOM
           </h1>
           <div className="w-24 h-1 bg-yellow-500 mx-auto mb-2"></div>
-          <p className="text-yellow-400 font-medium tracking-wider">LAGRANGE METHOD</p>
+          <p className="text-yellow-400 font-medium tracking-wider">METODE LAGRANGE</p>
         </div>
 
         {/* Main Content */}
@@ -103,7 +120,6 @@ export default function LagrangeInterpolation() {
             <InterpolationChart data={chartData} points={points} />
           </div>
         </div>
-
         <About />
       </div>
     </div>
