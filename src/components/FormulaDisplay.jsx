@@ -18,15 +18,15 @@ export function FormulaDisplay({ formula }) {
     } else if (formulaRef.current) {
       formulaRef.current.textContent = '';
     }
-  }, [formula]); // Jalankan ulang efek ini ketika prop 'formula' berubah
+  }, [formula]); 
 
-  if (!formula) return null; // Jangan render apa pun jika tidak ada formula
+  if (!formula) return null; 
 
   return (
     <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
       <h2 className="text-xl font-semibold mb-4 text-white">Rumus Polinom Lagrange:</h2>
       <div className="bg-gray-900 border border-gray-600 p-4 rounded overflow-x-auto">
-        <div ref={formulaRef} className="text-white text-lg"></div> {/* Tambahkan class untuk styling */}
+        <div ref={formulaRef} className="text-white text-lg"></div> 
       </div>
     </div>
   );

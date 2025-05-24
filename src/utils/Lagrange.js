@@ -1,4 +1,4 @@
-/*
+/** 
   Merupakan fungsi untuk menghitung nilai Polinom Interpolasi Lagrange di x tertentu.
   @param {number} x - Titik evaluasi.
   @param {Array<{x:number,y:number}>} points - Array titik (x_i, y_i), x_i harus unik.
@@ -70,9 +70,6 @@ export const generateLagrangeFormulaTex = (points) => {
     if (points.length > 0 && points.every((p) => Math.abs(p.y) === 0)) {
       P_x_formula_string += "0";
     } else {
-      // Kasus ini seharusnya tidak terjadi jika points.length > 0
-      // karena akan selalu ada setidaknya satu term y_i kecuali semua y_i adalah 0.
-      // Jika tidak ada poin, sudah ditangani di awal.
       P_x_formula_string = "P(x) = \\text{Tidak dapat membentuk rumus}";
     }
   } else {
