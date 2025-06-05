@@ -33,7 +33,7 @@ export function About() {
      <p className="text-gray-400 mt-4 text-sm">
         Setiap polinom basis <InlineMath math={`L_i(x)`} /> memiliki sifat{' '}
         <InlineMath math={`L_i(x_k) = 1 \\text{ jika } k = i`} /> dan{' '}
-        <InlineMath math={`L_i(x_k) = 0 \\text{ jika } k \\neq i`} />. Ini memastikan
+        <InlineMath math={`L_i(x_k) = 0 \\text{ jika } j \\neq i`} />. Ini memastikan
         bahwa polinom <InlineMath math={`P(x)`} /> yang dihasilkan akan
         melewati setiap titik <InlineMath math={`(x_i, y_i)`} />.
       </p>

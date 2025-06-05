@@ -6,22 +6,30 @@ export function PointsInput({ points, onChange, onAdd, onRemove }) {
         <div key={idx} className="flex items-center space-x-3 mb-3">
           <label className="text-gray-300 w-16">Point {idx + 1}:</label>
           <div className="flex space-x-2">
-            <input
-              type="number"
-              step="any"
-              value={point.x}
-              onChange={(e) => onChange(idx, "x", parseFloat(e.target.value) || 0)}
-              className="border border-gray-600 rounded p-2 w-20 bg-gray-700 text-white focus:border-yellow-500 focus:outline-none"
-              placeholder="x"
-            />
-            <input
-              type="number"
-              step="any"
-              value={point.y}
-              onChange={(e) => onChange(idx, "y", parseFloat(e.target.value) || 0)}
-              className="border border-gray-600 rounded p-2 w-20 bg-gray-700 text-white focus:border-yellow-500 focus:outline-none"
-              placeholder="y"
-            />
+            {/* Input untuk X */}
+            <div className="flex items-center space-x-1">
+              <span className="text-gray-400 text-sm">X:</span> {/* Indikator X */}
+              <input
+                type="number"
+                step="any"
+                value={point.x}
+                onChange={(e) => onChange(idx, "x", parseFloat(e.target.value) || 0)}
+                className="border border-gray-600 rounded p-2 w-20 bg-gray-700 text-white focus:border-yellow-500 focus:outline-none"
+                placeholder="x"
+              />
+            </div>
+            {/* Input untuk Y */}
+            <div className="flex items-center space-x-1">
+              <span className="text-gray-400 text-sm">Y:</span> {/* Indikator Y */}
+              <input
+                type="number"
+                step="any"
+                value={point.y}
+                onChange={(e) => onChange(idx, "y", parseFloat(e.target.value) || 0)}
+                className="border border-gray-600 rounded p-2 w-20 bg-gray-700 text-white focus:border-yellow-500 focus:outline-none"
+                placeholder="y"
+              />
+            </div>
           </div>
           <button
             onClick={() => onRemove(idx)}
